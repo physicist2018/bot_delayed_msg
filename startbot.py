@@ -3,11 +3,14 @@ import sys
 import logging
 from os import getenv
 from datetime import datetime
+from dotenv import load_dotenv
+
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
+
 
 from periodic import periodic
 from db import (
@@ -19,11 +22,7 @@ from db import (
 )
 
 
-me_id: str = '5490958448'
-token = getenv('API_TOKEN')
-true_token = '7481590445:AAG5ekDL0ro1gsvi-pPWW7V-eb2b9UhFP50'
-API_TOKEN = true_token if not token else token
-
+me_id: str = ''
 dp = Dispatcher()
 
 
@@ -83,7 +82,7 @@ async def send_message(bot: Bot, infobase_id=None, message=''):
         builder.add(types.InlineKeyboardButton(
             text='Продлить? ',
             callback_data='continue_'+infobase_id
-            )
+        )
         )
     await bot.send_message(
         me_id, message, reply_markup=builder.as_markup())
@@ -112,16 +111,22 @@ async def check_infobases(bot: Bot):
 
 
 if __name__ == '__main__':
+    load_dotenv()
+    # API чатбота
+    API_TOKEN = getenv('API_TOKEN', '')
+    # зесь помести id своего аккаунта
+    me_id = getenv('MY_CHAT_ID', '')
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     create_db_and_tables()
     # создаем экземпляр бота
-    bot = Bot(API_TOKEN)
+    bot = Bot(token=API_TOKEN)
 
     loop = asyncio.get_event_loop()
 
     # запускаем периодическую функцию проверки БД
-    loop.create_task(periodic(
-        SCAN_TIME_DELTA.seconds, check_infobases, bot,
+    loop.create_task(
+        periodic(
+            SCAN_TIME_DELTA.seconds, check_infobases, bot
         )
     )
 
