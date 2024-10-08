@@ -79,10 +79,11 @@ async def main(bot: Bot) -> None:
 async def send_message(bot: Bot, infobase_id=None, message=''):
     builder = InlineKeyboardBuilder()
     if infobase_id:
-        builder.add(types.InlineKeyboardButton(
-            text='Продлить? ',
-            callback_data='continue_'+infobase_id
-        )
+        builder.add(
+            types.InlineKeyboardButton(
+                text='Продлить? ',
+                callback_data='continue_' + infobase_id
+            )
         )
     await bot.send_message(
         me_id, message, reply_markup=builder.as_markup())

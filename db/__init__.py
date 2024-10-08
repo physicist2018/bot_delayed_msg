@@ -21,7 +21,8 @@ def create_db_and_tables() -> None:
     Base.metadata.create_all(engine)
 
 
-def create_infobase_and_scedule() -> Tuple[InfobaseModel, ScheduleModel]:
+def create_infobase_and_scedule(
+) -> Tuple[InfobaseModel, ScheduleModel]:
     infobase = create_infobase_item()
     schedule = create_schedule_item(infobase.uuid, infobase.start_time)
     with Session(engine) as session:
@@ -73,6 +74,8 @@ def extend_working_time(uid: str) -> None:
         obj = session.query(ScheduleModel).filter(
             ScheduleModel.uuid == uid
         ).one()
+
+        # чего-то нашли?
         if obj:
             obj.continue_time = obj.continue_time + ADVANCE_DELTA
             obj.delete_time = obj.delete_time + ADVANCE_DELTA
@@ -80,6 +83,9 @@ def extend_working_time(uid: str) -> None:
 
 
 def get_active_infobases() -> List[str]:
+    """
+    Возвращает список иднетификаторов инфобаз
+    """
     with Session(engine) as session:
         objs = session.query(InfobaseModel).filter(
             InfobaseModel.status == 1
